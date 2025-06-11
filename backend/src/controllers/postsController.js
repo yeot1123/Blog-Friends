@@ -31,11 +31,13 @@ exports.getPostById = async (req, res) => {
 
 exports.getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.findAll();
+    const posts = await Post.findAll({
+      order: [['postId', 'DESC']]
+    });
     res.json(posts);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to fetch posts' });
+    res.  status(500).json({ error: 'Failed to fetch posts' });
   }
 };
 
