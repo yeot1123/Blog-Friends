@@ -31,7 +31,15 @@ exports.createComment = async (req, res) => {
       userId: req.userId // from authenticate middleware
     });
 
-    res.status(201).json(comment);
+    const fullComment = await Comment.findOne({
+      where: { commentId: comment.commentId },
+      include: [{ model: User, attributes: ['username'] }]
+    });
+
+    const io = req.app.get('io');
+    io.emit('newcomment', fullComment);
+
+    res.status(201).json(fullComment);
   } catch (error) {
     console.error('Error creating comment:', error);
     res.status(500).json({ error: 'Failed to create comment' });

@@ -10,21 +10,38 @@ const commentRoutes = require('./routes/comment');
 const authRoutes = require('./routes/auth');
 
 const app = express();
-app.use(cors());
+
+
 app.use(express.json());
 
-// Routes ใช้งาน
+
+app.use(cors({
+  origin: 'http://localhost:8080',  // frontend origin ที่ใช้จริง
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
+
 app.use('/api/posts', postRoutes);
 app.use('/api/comment', commentRoutes);
 app.use('/api/auth', authRoutes);
 
-// สร้าง HTTP Server แยก
+// สร้าง HTTP Server
 const server = http.createServer(app);
 
-// Socket.io
-const io = new Server(server, { cors: { origin: '*' } });
+// สร้าง Socket.io Server และตั้งค่า CORS
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:8080',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+
 app.set('io', io);
 
+// Event ของ Socket.io
 io.on('connection', (socket) => {
   console.log('A user connected');
   socket.on('disconnect', () => {
@@ -32,13 +49,15 @@ io.on('connection', (socket) => {
   });
 });
 
+
 const PORT = process.env.PORT || 3000;
+
 
 (async () => {
   try {
     await sequelize.authenticate();
     console.log('✅ Database connected');
-    await sequelize.sync({ alter: true });  // ใช้ alter:true เพื่อปรับ schema
+    await sequelize.sync({ alter: true });  // ปรับ schema ถ้าจำเป็น
     console.log('✅ Database synced');
 
     server.listen(PORT, () => {

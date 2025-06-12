@@ -23,7 +23,7 @@ const submitPost = async () => {
   try {
     const response = await axios.post(
       '/api/posts/createPost',
-      { title: title.value, content: content.value, userId },
+      { title: title.value, content: content.value},
       {
         headers: { Authorization: `Bearer ${token}` }
       }
