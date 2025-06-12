@@ -1,22 +1,42 @@
 <template>
-  <div>
-    <h2>New Post</h2>
-    <form @submit.prevent="submitPost">
-      <input v-model="title" placeholder="Title" required />
-      <textarea v-model="content" placeholder="Content" required></textarea>
-      <button type="submit">Add Post</button>
+  <div class="max-w-xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h2 class="text-2xl font-semibold mb-4">📝 Create New Post</h2>
+    <form @submit.prevent="submitPost" class="space-y-4">
+      <input
+        v-model="title"
+        type="text"
+        placeholder="Post Title"
+        required
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      <textarea
+        v-model="content"
+        placeholder="Write your content..."
+        required
+        rows="6"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      ></textarea>
+      <button
+        type="submit"
+        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
+      >
+        ➕ Add Post
+      </button>
     </form>
   </div>
 </template>
 
+
 <script setup>
 import axios from 'axios';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 
 const title = ref('');
 const content = ref('');
-const userId = localStorage.getItem('userId');
 const token = localStorage.getItem('token');
 
 const submitPost = async () => {
@@ -35,6 +55,8 @@ const submitPost = async () => {
 
     title.value = '';
     content.value = '';
+    router.push('/');
+
   } catch (error) {
     alert(error.message);
   }

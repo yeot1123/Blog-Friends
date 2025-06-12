@@ -22,26 +22,21 @@
       </router-link>
     </div>
 
-    <figure>
-
-    </figure>
-
-
-    <ul class="space-y-2">
+    <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <li
         v-for="post in posts"
         :key="post.postId"
-        :class="[                       // v-bind
-          'border p-4 rounded transition',
-          post.isNew ? 'bg-yellow-100 animate-pulse' : 'hover:bg-gray-100'
-        ]"
+        class="border p-4 rounded shadow hover:shadow-md bg-white transition"
       >
         <router-link
           :to="`/posts/${post.postId}`"
-          class="text-lg font-semibold text-blue-700 hover:underline"
+          class="text-lg font-bold text-blue-700 hover:underline block mb-2"
         >
           {{ post.title }}
         </router-link>
+        <p class="text-gray-600 text-sm">
+          {{ post.content?.slice(0, 100) }}...
+        </p>
       </li>
     </ul>
   </div>

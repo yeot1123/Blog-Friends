@@ -1,37 +1,49 @@
 <template>
-  <div v-if="post">
-    <h2>{{ post.title }}</h2>
-    <p>{{ post.content }}</p>
-    <p>by {{ post.User.username }}</p>
+  <div class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <div v-if="post">
+      <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ post.title }}</h2>
+      <p class="text-gray-700 mb-4">{{ post.content }}</p>
+      <p class="text-sm text-gray-500 mb-6">By <span class="font-semibold">{{ post.User.username }}</span></p>
 
-
-    <form @submit.prevent="handleCommentSubmit">
-      <div>
-        <ul>
-          <li v-for="comment in post.Comments" :key="comment.id" :class="{ 'new-comment': comment.isNew }">
-            {{ comment.content }} — {{ comment.User.username }}
+      <div class="mb-6">
+        <h3 class="text-xl font-semibold mb-2">💬 Comments</h3>
+        <ul class="space-y-2">
+          <li
+            v-for="comment in post.Comments"
+            :key="comment.id"
+            :class="[
+              'p-3 border rounded',
+              comment.isNew ? 'bg-yellow-100 border-yellow-300' : 'bg-gray-50 border-gray-200'
+            ]"
+          >
+            <p class="text-gray-800">{{ comment.content }}</p>
+            <p class="text-sm text-gray-500">— {{ comment.User.username }}</p>
           </li>
         </ul>
-
-        <div>
-          <h3>Comment On this post</h3>
-          <input type="text" name="content" id="content" v-model="commentContent">
-          <button type="submit">Submit</button>
-        </div>
-
       </div>
-    </form>
 
-    <!-- <div v-if="!post.Comments.length">
-      <p>No comments yet.</p>
-    </div> -->
-
-
-  </div>
-  <div v-else>
-    <p>Loading...</p>
+      <form @submit.prevent="handleCommentSubmit" class="space-y-4">
+        <h3 class="text-lg font-medium">Add a Comment</h3>
+        <input
+          type="text"
+          v-model="commentContent"
+          placeholder="Write your comment..."
+          class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
+        >
+          📩 Submit
+        </button>
+      </form>
+    </div>
+    <div v-else>
+      <p class="text-center text-gray-500">Loading...</p>
+    </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue';
