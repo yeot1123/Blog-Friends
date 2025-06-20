@@ -51,14 +51,16 @@ const submitPost = async () => {
 
     if (response.status === 201) {
       alert('Post added successfully!');
+      router.push('/');
     }
 
     title.value = '';
     content.value = '';
-    router.push('/');
-
   } catch (error) {
-    alert(error.message);
+    if (error.status === 401){
+      alert('Please Login Before Create Post !!')
+      router.push('/login')
+    }
   }
 };
 </script>
