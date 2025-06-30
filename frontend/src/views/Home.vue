@@ -31,19 +31,38 @@
       </router-link>
     </div>
 
-    <!-- Post Grid -->
     <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <li
         v-for="post in posts"
         :key="post.postId"
         class="border p-4 rounded shadow hover:shadow-md bg-white transition"
       >
+
+        <div class="flex items-center gap-3 mb-3">
+          <img
+            v-if="post.User?.imageUrl"
+            :src="post.User.imageUrl"
+            alt="Profile"
+            class="w-10 h-10 rounded-full object-cover border"
+          />
+          <span class="text-sm font-medium text-gray-700">
+            {{ post.User?.username || 'Unknown' }}
+          </span>
+        </div>
+
+
         <router-link
           :to="`/posts/${post.postId}`"
           class="text-lg font-bold text-blue-700 hover:underline block mb-2"
         >
+          <img
+            v-if="post.imageUrl"
+            :src="post.imageUrl"
+            class="w-full h-48 object-cover rounded mb-3"
+          />
           {{ post.title }}
         </router-link>
+
         <p class="text-gray-600 text-sm">
           {{ post.content?.slice(0, 100) }}...
         </p>
@@ -51,6 +70,7 @@
     </ul>
   </div>
 </template>
+
 
 
 <script setup>

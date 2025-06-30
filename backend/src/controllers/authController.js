@@ -11,6 +11,7 @@ const SECRET_KEY = process.env.JWT_SECRET;
 exports.register = async (req, res) => {
   try {
     const { username, password } = req.body;
+    const imageUrl  = req.file?.path || null;
 
     // Validate input
     if (!username || !password) {
@@ -29,7 +30,8 @@ exports.register = async (req, res) => {
     // Create user
     const newUser = await User.create({
       username,
-      password: hashedPassword
+      password: hashedPassword,
+      imageUrl
     });
 
     res.status(201).json({ message: 'User registered successfully', userId: newUser.id });

@@ -3,6 +3,9 @@ const cors = require('cors');
 const http = require('http');
 const { sequelize } = require('./models');
 const { Server } = require('socket.io');
+require('dotenv').config(); // ✅ โหลดค่าจาก .env ก่อน
+
+
 
 // Routes
 const postRoutes = require('./routes/posts');
@@ -17,7 +20,6 @@ app.use(express.json());
 
 app.use(cors({
   origin: 'http://localhost:8080',  // frontend origin ที่ใช้จริง
-  methods: ['GET', 'POST'],
   credentials: true
 }));
 
@@ -50,7 +52,7 @@ io.on('connection', (socket) => {
 });
 
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT ;
 
 
 (async () => {

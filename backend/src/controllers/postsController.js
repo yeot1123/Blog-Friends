@@ -9,12 +9,20 @@ exports.getPostById = async (req, res) => {
     const post = await Post.findOne({
       where: { postId },
       include: [
-        { model: User, attributes: ['username'] },  // เจ้าของโพสต์
+        {
+          model: User,
+          attributes: ['username', 'imageUrl'], // ✅ fixed here
+        },
         {
           model: Comment,
-          include: [{ model: User, attributes: ['username'] }]  // คอมเมนต์ + คนคอมเมนต์
-        }
-      ]
+          include: [
+            {
+              model: User,
+              attributes: ['username'],
+            },
+          ],
+        },
+      ],
     });
 
     if (!post) {
@@ -32,8 +40,13 @@ exports.getPostById = async (req, res) => {
 exports.getAllPosts = async (req, res) => {
   try {
     const posts = await Post.findAll({
+      include: {
+        model: User,
+        attributes: ['username', 'imageUrl']
+      },
       order: [['postId', 'DESC']]
     });
+
     res.json(posts);
   } catch (error) {
     console.error(error);
@@ -45,10 +58,14 @@ exports.getAllPosts = async (req, res) => {
 exports.createPost = async (req, res) => {
   try {
     const { title, content } = req.body;
+    const imageUrl = req.file?.path || null;
+
     const newPost = await Post.create({
       title,
       content,
-      userId: req.userId}); // userId มาจาก middleware auth
+      imageUrl,
+      userId: req.userId
+    });
 
     const io = req.app.get('io');
     io.emit('newPost', newPost)

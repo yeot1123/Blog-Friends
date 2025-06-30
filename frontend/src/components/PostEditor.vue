@@ -16,11 +16,14 @@
         rows="6"
         class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
       ></textarea>
+      <input type="file" @change="handleImageChange" />
+
+
       <button
         type="submit"
         class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
       >
-        ➕ Add Post
+      ➕ Add Post
       </button>
     </form>
   </div>
@@ -34,18 +37,33 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-
 const title = ref('');
 const content = ref('');
+const image = ref(null);
 const token = localStorage.getItem('token');
+
+// จัดเก็บไฟล์ภาพไว้ในตัวแปร
+const handleImageChange = (e) => {
+  image.value = e.target.files[0];
+};
 
 const submitPost = async () => {
   try {
+    const formData = new FormData();
+    formData.append('title', title.value);
+    formData.append('content', content.value);
+    if (image.value) {
+      formData.append('image', image.value);
+    }
+
     const response = await axios.post(
-      '/api/posts/createPost',
-      { title: title.value, content: content.value},
+      '/api/posts/createPost',  // ต้องให้ backend รองรับ multipart/form-data
+      formData,
       {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       }
     );
 
@@ -56,10 +74,14 @@ const submitPost = async () => {
 
     title.value = '';
     content.value = '';
+    image.value = null;
   } catch (error) {
-    if (error.status === 401){
-      alert('Please Login Before Create Post !!')
-      router.push('/login')
+    console.error('Create post error:', error);
+    if (error?.response?.status === 401) {
+      alert('Please Login Before Create Post !!');
+      router.push('/login');
+    } else {
+      alert('Failed to create post.');
     }
   }
 };

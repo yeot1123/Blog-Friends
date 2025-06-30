@@ -6,7 +6,8 @@ const sequelize =  require('../../config/db');
 const User = sequelize.define('User', {
   userId: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   username: { type: DataTypes.STRING, unique: true, allowNull: false },
-  password: { type: DataTypes.STRING, allowNull: false }
+  password: { type: DataTypes.STRING, allowNull: false },
+  imageUrl: {type: DataTypes.STRING, allowNull: true}
 });
 
 module.exports = User;

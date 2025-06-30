@@ -2,8 +2,26 @@
   <div class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
     <div v-if="post">
       <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ post.title }}</h2>
-      <p class="text-gray-700 mb-4">{{ post.content }}</p>
       <p class="text-sm text-gray-500 mb-6">By <span class="font-semibold">{{ post.User.username }}</span></p>
+      <p class="text-gray-700 mb-4">{{ post.content }}</p>
+
+      <div class="flex items-center gap-3 mb-3">
+        <img
+          v-if="post.User?.imageUrl"
+          :src="post.User.imageUrl"
+          alt="Profile"
+          class="w-10 h-10 rounded-full object-cover border"
+        />
+        <span class="text-sm font-medium text-gray-700">
+          {{ post.User?.username || 'Unknown' }}
+        </span>
+      </div>
+
+      <img class=" w-full h-48 object-cover rounded mb-3"
+        v-if="post.imageUrl"
+        :src="post.imageUrl"
+        alt="Post image"
+      />
 
       <div class="mb-6">
         <h3 class="text-xl font-semibold mb-2">💬 Comments</h3>
