@@ -31,7 +31,11 @@
       </router-link>
     </div>
 
-    <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div v-if="loading">
+      <p class="text-center text-gray-500">Loading...</p>
+    </div>
+
+    <ul v-else-if="posts" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       <li
         v-for="post in posts"
         :key="post.postId"
@@ -68,7 +72,11 @@
         </p>
       </li>
     </ul>
-  </div>
+    <div v-else>
+      <p class="text-center text-gray-500"> Post Not Found</p>
+    </div>
+</div>
+
 </template>
 
 
