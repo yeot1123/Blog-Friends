@@ -19,7 +19,7 @@ app.use(express.json());
 
 
 app.use(cors({
-  origin: 'http://localhost:8080',  // frontend origin ที่ใช้จริง
+  origin: process.env.FRONTEND_ORIGIN,  // frontend origin ที่ใช้จริง
   credentials: true
 }));
 
@@ -34,7 +34,7 @@ const server = http.createServer(app);
 // สร้าง Socket.io Server และตั้งค่า CORS
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:8080',
+    origin: process.env.FRONTEND_ORIGIN,
     methods: ['GET', 'POST'],
     credentials: true
   }
