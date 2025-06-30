@@ -50,15 +50,16 @@
         />
         <button
           type="submit"
-          class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
+          :disabled="isSubmitting"
+          class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          📩 Submit
+          {{ isSubmitting ? 'Submitting...' : '➕ 💌 Submit' }}
         </button>
       </form>
-    </div>
-    <div v-else>
-      <p class="text-center text-gray-500">Loading...</p>
-    </div>
+      </div>
+      <div> v-else>
+        <p class="text-center text-gray-500">Loading...</p>
+      </div>
   </div>
 </template>
 
@@ -75,7 +76,7 @@ const post = ref(null);
 const loading = ref(true);
 const error = ref(null);
 const commentContent = ref('');
-
+const isSubmitting = ref(false);
 import socket from '../socket';  // import socket จากไฟล์กลาง
 
 const token = localStorage.getItem('token');
@@ -95,23 +96,29 @@ onMounted(async () => {
 
 
 const handleCommentSubmit = async () => {
+  if (isSubmitting.value || !commentContent.value.trim()) return;
+
+  isSubmitting.value = true;
+
   try {
-    await axios.post('/api/comment/createComment',
+    await axios.post(
+      '/api/comment/createComment',
       {
         content: commentContent.value,
         postId: post.value.postId,
       },
       {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
 
-    //post.value.Comments.push(res.data); // ดันคอมเมนต์ใหม่เข้า array
     commentContent.value = '';
   } catch (error) {
     console.error('Error submitting comment:', error);
+  } finally {
+    isSubmitting.value = false;
   }
-}
+};
 
   socket.on('newcomment', (newcomment) => {
     newcomment.isNew = true;

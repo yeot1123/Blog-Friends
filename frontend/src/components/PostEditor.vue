@@ -18,12 +18,12 @@
       ></textarea>
       <input type="file" @change="handleImageChange" />
 
-
       <button
         type="submit"
-        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200"
+        :disabled="isSubmitting"
+        class="w-50 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-      ➕ Add Post
+        {{ isSubmitting ? 'Submitting...' : '➕ Add Post' }}
       </button>
     </form>
   </div>
@@ -42,12 +42,18 @@ const content = ref('');
 const image = ref(null);
 const token = localStorage.getItem('token');
 
+const isSubmitting = ref(false);
+
 // จัดเก็บไฟล์ภาพไว้ในตัวแปร
 const handleImageChange = (e) => {
   image.value = e.target.files[0];
 };
 
 const submitPost = async () => {
+  if (isSubmitting.value) return;
+
+  isSubmitting.value = true;
+
   try {
     const formData = new FormData();
     formData.append('title', title.value);
@@ -57,7 +63,7 @@ const submitPost = async () => {
     }
 
     const response = await axios.post(
-      '/api/posts/createPost',  // ต้องให้ backend รองรับ multipart/form-data
+      '/api/posts/createPost',
       formData,
       {
         headers: {
@@ -75,6 +81,7 @@ const submitPost = async () => {
     title.value = '';
     content.value = '';
     image.value = null;
+
   } catch (error) {
     console.error('Create post error:', error);
     if (error?.response?.status === 401) {
@@ -83,6 +90,9 @@ const submitPost = async () => {
     } else {
       alert('Failed to create post.');
     }
+  } finally {
+    isSubmitting.value = false;
   }
 };
+
 </script>

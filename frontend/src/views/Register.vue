@@ -23,9 +23,10 @@
 
         <button
           type="submit"
+          :disabled="isSubmitting"
           class="w-full py-2 font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition"
         >
-          Register
+          {{ isSubmitting ? 'Submitting...' : 'Register' }}
         </button>
       </form>
     </div>
@@ -42,6 +43,7 @@ const username = ref('');
 const password = ref('');
 const router = useRouter();
 const image = ref(null);
+const isSubmitting = ref(false);
 
 const handleImageChange = (e) => {
   image.value = e.target.files[0];
@@ -49,6 +51,9 @@ const handleImageChange = (e) => {
 
 
 const handleRegister = async () => {
+  if (isSubmitting.value) return;
+
+  isSubmitting.value = true;
   try {
     const formData = new FormData();
 
@@ -64,6 +69,9 @@ const handleRegister = async () => {
   } catch (error) {
     console.error('Register failed:', error);
     alert(error);
+  } finally {
+    isSubmitting.value = false;
   }
+
 };
 </script>
