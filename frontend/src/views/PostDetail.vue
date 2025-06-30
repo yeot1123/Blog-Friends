@@ -123,13 +123,21 @@ const handleCommentSubmit = async () => {
 
     commentContent.value = '';
   } catch (error) {
-      console.error('Error submitting comment:', error);
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data?.error || 'Unexpected error';
 
-      if (error.response?.status === 401) {
-        alert('⛔ กรุณา Login ก่อนแสดงความคิดเห็น');
-        router.push('/login');
+        if (status === 401) {
+          alert('กรุณาเข้าสู่ระบบก่อนแสดงความคิดเห็น');
+          router.push('/login');
+        } else if (status === 400) {
+          alert('⚠️ กรุณากรอกข้อความคอมเมนต์');
+        } else {
+          alert(`❌ เกิดข้อผิดพลาด: ${message}`);
+        }
       } else {
-        alert('ไม่สามารถส่งคอมเมนต์ได้ ลองใหม่');
+        console.error('❌ Unknown error:', error);
+        alert('เกิดข้อผิดพลาดที่ไม่รู้จัก');
       }
   } finally {
       isSubmitting.value = false;

@@ -25,6 +25,11 @@ exports.createComment = async (req, res) => {
       return res.status(400).json({ error: 'content and postId are required' });
     }
 
+    const user = await User.findByPk(req.userId);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found or unauthorized' });
+    }
+
     const comment = await Comment.create({
       content,
       postId,
