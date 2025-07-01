@@ -25,7 +25,7 @@
         v-if="post.imageUrl"
         :src="post.imageUrl"
         alt="Post image"
-        class="w-full h-48 object-cover rounded mb-3"
+        class="w-full h-auto object-cover rounded mb-3"
       />
 
       <!-- คอมเมนต์ -->

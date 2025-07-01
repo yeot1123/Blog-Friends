@@ -3,7 +3,7 @@ const cors = require('cors');
 const http = require('http');
 const { sequelize } = require('./models');
 const { Server } = require('socket.io');
-require('dotenv').config(); // ✅ โหลดค่าจาก .env ก่อน
+require('dotenv').config();
 
 
 
@@ -19,7 +19,7 @@ app.use(express.json());
 
 
 app.use(cors({
-  origin: process.env.FRONTEND_ORIGIN,  // frontend origin ที่ใช้จริง
+  origin: process.env.FRONTEND_ORIGIN,
   credentials: true
 }));
 
