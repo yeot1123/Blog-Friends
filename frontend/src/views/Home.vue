@@ -31,17 +31,25 @@
       </router-link>
     </div>
 
+    <!-- Loading -->
     <div v-if="loading">
       <p class="text-center text-gray-500">Loading...</p>
     </div>
 
-    <ul v-else-if="posts" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <!-- Post List -->
+    <ul
+      v-else-if="posts"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
+    >
       <li
         v-for="post in posts"
         :key="post.postId"
-        class="border p-4 rounded shadow hover:shadow-md bg-white transition"
+        :class="[
+          'border p-4 rounded shadow hover:shadow-md transition',
+          post.hasNewComment ? 'border-yellow-400 bg-yellow-50' : 'bg-white'
+        ]"
       >
-
+        <!-- User Info -->
         <div class="flex items-center gap-3 mb-3">
           <img
             v-if="post.User?.imageUrl"
@@ -54,46 +62,83 @@
           </span>
         </div>
 
-
+        <!-- Post Title -->
         <router-link
           :to="`/posts/${post.postId}`"
-          class="text-lg font-bold text-blue-700 hover:underline block mb-2"
+          class="text-lg font-bold text-blue-700 hover:underline block"
         >
           <img
             v-if="post.imageUrl"
             :src="post.imageUrl"
-            class="w-full h-48 object-cover rounded mb-3"
+            class="w-full h-40 object-cover rounded mb-3"
           />
-          {{ post.title }}
+          <div class="flex items-center gap-2">
+            <span>{{ post.title }}</span>
+            <span
+              v-if="post.hasNewComment"
+              class="text-xs bg-yellow-300 text-yellow-900 px-2 py-0.5 rounded-full font-semibold animate-pulse"
+            >
+              💬 New comment
+            </span>
+          </div>
         </router-link>
 
-        <p class="text-gray-600 text-sm">
+        <!-- Snippet -->
+        <p class="text-gray-600 text-sm mt-2">
           {{ post.content?.slice(0, 100) }}...
         </p>
       </li>
     </ul>
-    <div v-else>
-      <p class="text-center text-gray-500"> Post Not Found</p>
-    </div>
-</div>
 
+    <!-- No Post -->
+    <div v-else>
+      <p class="text-center text-gray-500">Post Not Found</p>
+    </div>
+  </div>
 </template>
+
 
 
 
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
-import socket from "../socket"; // import socket จากไฟล์กลาง
+import socket from "../socket"; // socket.io client
 
 const posts = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
+// postId ที่มี comment ใหม่จาก localStorage
+const getNewCommentPostIds = () => {
+  return JSON.parse(localStorage.getItem("newCommentPosts") || "[]");
+};
+
+// เพิ่ม postId ที่มี comment ใหม่ลง localStorage
+const addNewCommentPostId = (postId) => {
+  const ids = getNewCommentPostIds();
+  if (!ids.includes(postId)) {
+    ids.push(postId);
+    localStorage.setItem("newCommentPosts", JSON.stringify(ids));
+  }
+};
+
+// ลบ postId ออกจาก localStorage เมื่อ user เปิดอ่านแล้ว
+// const removeNewCommentPostId = (postId) => {
+//   const ids = getNewCommentPostIds();
+//   const updated = ids.filter((id) => id !== postId);
+//   localStorage.setItem("newCommentPosts", JSON.stringify(updated));
+// };
+
 onMounted(async () => {
   try {
     const response = await axios.get("/api/posts");
-    posts.value = response.data;
+    const storedHighlightIds = getNewCommentPostIds();
+
+    posts.value = response.data.map((post) => ({
+      ...post,
+      hasNewComment: storedHighlightIds.includes(post.postId),
+    }));
   } catch (err) {
     console.error(err);
     error.value = "Failed to fetch posts";
@@ -102,13 +147,17 @@ onMounted(async () => {
   }
 });
 
-// Listen for new posts
-socket.on("newPost", (newPost) => {
-  newPost.isNew = true;
-  posts.value.unshift(newPost);
+// รับ comment ใหม่แบบ realtime แล้ว mark postId
+socket.on("newcomment", (comment) => {
+  const post = posts.value.find((p) => p.postId === comment.postId);
+  if (post) {
+    post.hasNewComment = true;
+    addNewCommentPostId(comment.postId); // บันทึกไว้ใน localStorage
 
-  setTimeout(() => {
-    newPost.isNew = false;
-  }, 15000);
+    // highlight ชั่วคราว 15 วินาที (UI)
+    setTimeout(() => {
+      post.hasNewComment = false;
+    }, 15000);
+  }
 });
 </script>

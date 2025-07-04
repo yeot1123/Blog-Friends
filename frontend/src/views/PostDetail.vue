@@ -1,11 +1,9 @@
 <template>
-  <div class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
+  <div class="max-w-2xl mx-auto p-4 sm:p-6 bg-white shadow-md rounded-lg">
     <div v-if="post">
-      <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ post.title }}</h2>
-      <p class="text-sm text-gray-500 mb-6">
-        By <span class="font-semibold">{{ post.User.username }}</span>
-      </p>
-      <p class="text-gray-700 mb-4">{{ post.content }}</p>
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
+        {{ post.title }}
+      </h2>
 
       <!-- โปรไฟล์ผู้เขียน -->
       <div class="flex items-center gap-3 mb-3">
@@ -16,22 +14,24 @@
           class="w-10 h-10 rounded-full object-cover border"
         />
         <span class="text-sm font-medium text-gray-700">
-          {{ post.User?.username || 'Unknown' }}
+          Post By {{ post.User?.username || 'Unknown' }}
         </span>
       </div>
+
+      <p class="text-gray-700 mb-4 whitespace-pre-line break-words">{{ post.content }}</p>
 
       <!-- รูปประกอบโพสต์ -->
       <img
         v-if="post.imageUrl"
         :src="post.imageUrl"
         alt="Post image"
-        class="w-full h-auto object-cover rounded mb-3"
+        class="w-auto max-auto object-cover rounded mb-4"
       />
 
       <!-- คอมเมนต์ -->
       <div class="mb-6">
-        <h3 class="text-xl font-semibold mb-2">💬 Comments</h3>
-        <ul class="space-y-2">
+        <h3 class="text-xl font-semibold mb-3">💬 Comments</h3>
+        <ul class="space-y-3">
           <li
             v-for="comment in post.Comments"
             :key="comment.id"
@@ -40,13 +40,13 @@
               comment.isNew ? 'bg-yellow-100 border-yellow-300' : 'bg-gray-50 border-gray-200'
             ]"
           >
-            <p class="text-gray-800">{{ comment.content }}</p>
-            <p class="text-sm text-gray-500">— {{ comment.User.username }}</p>
+            <p class="text-gray-800 break-words">{{ comment.content }}</p>
+            <p class="text-sm text-gray-500 mt-1">— {{ comment.User.username }}</p>
           </li>
         </ul>
       </div>
 
-
+      <!-- ฟอร์มคอมเมนต์ -->
       <form @submit.prevent="handleCommentSubmit" class="space-y-4">
         <h3 class="text-lg font-medium">Add a Comment</h3>
         <input
@@ -73,6 +73,7 @@
 
 
 
+
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
@@ -95,13 +96,19 @@ onMounted(async () => {
   try {
     const response = await axios.get(`/api/posts/${postId}`);
     post.value = response.data;
+
+    // ลบสถานะ highlight ของ postId นี้
+    const storedIds = JSON.parse(localStorage.getItem("newCommentPosts") || "[]");
+    const updated = storedIds.filter(id => id !== Number(postId));
+    localStorage.setItem("newCommentPosts", JSON.stringify(updated));
   } catch (err) {
     console.error(err);
-    error.value = 'Failed to fetch post detail';
+    error.value = "Failed to fetch post detail";
   } finally {
     loading.value = false;
   }
 });
+
 
 
 const handleCommentSubmit = async () => {
